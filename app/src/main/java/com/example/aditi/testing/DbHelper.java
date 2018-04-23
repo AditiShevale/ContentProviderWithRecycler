@@ -10,7 +10,8 @@ public class DbHelper extends SQLiteOpenHelper {
     private static final int VERSION = 1;
 
     public DbHelper(Context context) {
-        super(context, DATABASE_NAME, null, VERSION);
+        super(context, DATABASE_NAME,
+                null, VERSION);
 
     }
 
