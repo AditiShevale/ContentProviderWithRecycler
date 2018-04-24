@@ -7,9 +7,12 @@ import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import static com.example.aditi.testing.Contract.Entry.TABLE_NAME;
 
 public class TaskContentProvider extends ContentProvider {
 
@@ -24,6 +27,8 @@ public class TaskContentProvider extends ContentProvider {
     //create a static variable for the uri matcher
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
+    private DbHelper mTaskDbHelper;
+
 
     private static UriMatcher buildUriMatcher() {
 
@@ -68,7 +73,7 @@ public class TaskContentProvider extends ContentProvider {
 
                 // Insert new values into the database
                 // Inserting values into tasks table
-                long id = db.insert(Contract.Entry.TABLE_NAME,
+                long id = db.insert(TABLE_NAME,
                         null,
                         values);
                 if ( id > 0 ) {
@@ -110,7 +115,7 @@ public class TaskContentProvider extends ContentProvider {
         switch (match) {
             // Query for the tasks directory
             case NAME:
-                retCursor =  db.query(Contract.Entry.TABLE_NAME,
+                retCursor =  db.query(TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
@@ -133,17 +138,63 @@ public class TaskContentProvider extends ContentProvider {
 
     @Override
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
+        final SQLiteDatabase db = mTaskDbHelper.getWritableDatabase();
+        int match = sUriMatcher.match(uri);
 
-        throw new UnsupportedOperationException("Not yet implemented");
+
+        // Keep track of the number of deleted tasks
+
+        int tasksDeleted; // starts as 0
+
+
+        // COMPLETED (2) Write the code to delete a single row of data
+        switch (match){
+
+            case NAME_WITH_ID:
+
+                String id = uri.getPathSegments().get(1);
+                tasksDeleted = db.delete(TABLE_NAME,"_id=?",
+                        new String[]{id});
+                break;
+
+                default:
+                    throw  new UnsupportedOperationException("Unknown Uri:"+uri);
+        }
+        if (tasksDeleted != 0){
+            getContext().getContentResolver().notifyChange(uri,null);
+        }
+        return tasksDeleted;
     }
 
 
     @Override
     public int update(@NonNull Uri uri, ContentValues values, String selection,
                       String[] selectionArgs) {
+        int tasksUpdated;
 
-        throw new UnsupportedOperationException("Not yet implemented");
+        int match = sUriMatcher.match(uri);
+
+        switch (match) {
+            case NAME_WITH_ID   :
+                //update a single task by getting the id
+                String id = uri.getPathSegments().get(1);
+                //using selections
+                tasksUpdated = mTaskDbHelper.getWritableDatabase().update(TABLE_NAME, values, "_id=?", new String[]{id});
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+
+        if (tasksUpdated != 0) {
+            //set notifications if a task was updated
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+        // return number of tasks updated
+        return tasksUpdated;
     }
+
+
 
 
     @Override
