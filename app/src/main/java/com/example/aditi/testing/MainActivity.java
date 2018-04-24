@@ -133,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements
     public void onLoadFinished (android.support.v4.content.Loader< Cursor > loader, Cursor data){
 
         mRecyclerViewAdapter.swapCursor(data);
+
     }
 
     @Override

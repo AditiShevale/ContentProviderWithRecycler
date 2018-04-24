@@ -15,19 +15,23 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter
     private Cursor mCursor;
     private Context mContext;
 
-    public RecyclerAdapter(Context context){
+    public RecyclerAdapter(Context context) {
+
         this.mContext = context;
     }
-    @NonNull
+
+
     @Override
-    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View view = inflater.inflate(R.layout.item_list, parent, false);
         return new MyViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+    public void onBindViewHolder(MyViewHolder holder, int position) {
+
         // Indices for the _id, name
 
         int idIndex = mCursor.getColumnIndex(Contract.Entry._ID);
@@ -44,6 +48,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter
         holder.txt.setText(name);
     }
 
+
     @Override
     public int getItemCount() {
         if (mCursor == null) {
@@ -53,8 +58,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter
     }
 
     public Cursor swapCursor(Cursor c) {
+        // check if this cursor is the same as the previous cursor (mCursor)
         if (mCursor == c) {
-            return null;
+            return null; // bc nothing has changed
         }
         Cursor temp = mCursor;
         this.mCursor = c; // new cursor value assigned
@@ -67,13 +73,15 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter
         return temp;
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder{
-
+    public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView txt;
 
         public MyViewHolder(View itemView) {
             super(itemView);
+
             txt = itemView.findViewById(R.id.textView);
         }
     }
+
+
 }
